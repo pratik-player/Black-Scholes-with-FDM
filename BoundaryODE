@@ -1,0 +1,28 @@
+N = input("Please input the reciprocal of the step size: ");
+sig = input("Please input the constant sigma: ");
+r = input("Please input the constant r: ");
+a = input("Please input boundary condition at u_0");
+c = input("Please input boundary condition at u_1");
+
+h = 1/N; % Step size
+points = (h:h:1-h)'; % Domain not including boundary points
+main_diag = (-1 * N^2 * (points.^2 * sig^2) - r); % Main diagonal
+under_diag = (N^2 * (points(2:end)).^2 * sig^2)/2 - (r * (points(2:end) * N)/2); % Under
+right_diag = (N^2 * (points(1:end-1)).^2 * sig^2)/2 + (r * (points(1:end-1) * N)/2); % Right
+A = diag(main_diag, 0) + diag(under_diag, -1) + diag(right_diag, 1);
+
+% Initialize b as zero vector and adjust first element based on u0=1
+b = zeros(length(points), 1);
+b(1) = -a*((N^2 * points(1)^2 * sig^2)/2 - (r * points(1) * N)/2); % Adjusted first point
+b(end) = -c*((N^2 * (points(end)).^2 * sig^2)/2 + (r * (points(end) * N)/2)); 
+
+disp(A);
+disp(b);
+x = A \ b; % Solve for vector x the approximated function values 
+disp(x);
+
+figure(1);
+plot([0; points; 1], [a; x; c]); % Include boundary condition in plot
+xlabel('x')
+ylabel('u(x)')
+title('Solution to 4.5x^2u_{xx}+2xu_x-2u u(0)=5 U(1)=4')
